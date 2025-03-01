@@ -13,19 +13,32 @@ Nuestro proyecto esta basado en la idea del reciclaje, ¿Como podemos aportar a 
 
 ## Librerias:
 > [!IMPORTANT]
-> Se deben instalar las librerias correspondientes para usar la interfaz grafica.
+> Es importante verificar si las librerias estan instaladas en su equipo.
 
-*
-*
-*
-*
-*
-*
-*
+Estas son las librerias que usamos para la creacion de nuestro proyecto.
 
-Lista de librerias usadas
+**Modelo CNN**:
 
-## Data(#Data):
+* Google.colab (Solo para entrenar el modelo)
+* OS
+* numpy
+* matplotlib
+* tensorflow
+* sklearn.metrics
+* cv2
+* glob
+
+**Interfaz Grafica**:
+
+* tkinter
+* PIL (Pillow)
+* numpy
+* OS
+* tensorflow
+* shutil
+
+
+## Data:
 
 Nuestra data usada fue extraida de: [LINK] | Con esta data entrenamos nuestro modelo, todo su entrenamiento y detalles del mismo se encuentran tanto en el jupyter: [Nombre del Jupyter] y a un PDF que redactamos nosotros de como fue este proceso, el PDF se llama: [PDF].
 
@@ -40,19 +53,17 @@ Este proyecto fue creado por: Julio Zambrano, Angel Villegas y Andrea Ruiz. Junt
 
 Desde Lights of Hope le agradecemos de todo corazon su constante ayuda y enseñanza a lo largo de estos 6 meses del curso, junto al equipo de Samsung Innovation Campus por hacer esto posible. 
 
-
-
 ## Acerca de: Lights Of Hope 
 
 ![Light_of_Hope_logo](https://github.com/user-attachments/assets/b01e8d97-32d6-4e93-b57a-370c48492a4a)
 
-![NOTE]
 Somos un equipo de actualmente tres personas, conformados por: Julio Zambrano, Angel Villegas y Andrea Ruiz. Creamos este nombre para conformar nuestro equipo y hacer nuestros proyectos en Samsung Innovation Campus (SIC).
 
-Mencion honorifica: A nuestros compañeros Jose Villalobos y Rodolfo Rodriguez por aportar a la creacion de este nombre y primer proyecto hecho.
+[!NOTE]
+> Mencion honorifica: A nuestros compañeros Jose Villalobos y Rodolfo Rodriguez por aportar a la creacion de este nombre y primer proyecto hecho.
 
-### Proyectos hechos
+### Proyectos realizados:
 
-Analisis de desastres naturales: Tendencias, Patrones y Correlacion: https://github.com/JulioZambrano91/Lights-of-Hope
+[Analisis de desastres naturales: Tendencias, Patrones y Correlacion](https://github.com/JulioZambrano91/Lights-of-Hope)
 
 # Fin.
