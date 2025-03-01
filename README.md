@@ -15,8 +15,13 @@ Lista de librerias usadas
 
 Descripcion de la interfaz grafica
 
+
 ## Integrantes y tutores.
 
 Este proyecto fue creado por: Julio Zambrano, Angel Villegas y Andrea Ruiz. Junto a la constante ayuda de nuestro tutores: Jenny Remolina y Alvaro Arauz.
 
 Desde Lights of Hope le agradecemos de todo corazon su constante ayuda y enseñanza a lo largo de estos 6 meses del curso. 
+
+## Acerca de: Lights Of Hope
+
+Otro proyecto: poner el link de data analisys de los desastres naturales.
