@@ -12,8 +12,8 @@ Nuestro proyecto esta basado en la idea del reciclaje, ¿Como podemos aportar a 
 7. [Agradecimientos](#Agradecimientos)
 
 ## Librerias:
-[!IMPORTANT]
-Se deben instalar las librerias correspondientes para usar la interfaz grafica.
+> [!IMPORTANT]
+> Se deben instalar las librerias correspondientes para usar la interfaz grafica.
 
 *
 *
