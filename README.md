@@ -6,13 +6,13 @@ Nuestro proyecto se basa en un detector de imagenes que tiene 6 categorias: [pap
 1. [Librerias](#Librerias)
 2. [Extraccion de la data](#Data)
 3. [Graficas](#Graficas)
-4. [Interfaz Grafica](#Interfaz Grafica)
+4. [Interfaz Grafica](#Interfaz_Grafica)
 5. [PDF](#PDF)
 6. [Acerca de](#Acerca_de)
 7. [Agradecimientos](#Agradecimientos)
 
 
-## Data:
+## Data(#Data):
 
 Nuestra data usada fue extraida de: [LINK] | Con esta data entrenamos nuestro modelo, todo su entrenamiento y detalles del mismo se encuentran tanto en el jupyter: [Nombre del Jupyter] y a un PDF que redactamos nosotros de como fue este proceso, el PDF se llama: [PDF].
 
