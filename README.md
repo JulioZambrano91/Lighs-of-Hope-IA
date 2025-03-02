@@ -59,7 +59,7 @@ Desde Lights of Hope le agradecemos de todo corazon su constante ayuda y enseña
 
 Somos un equipo de actualmente tres personas, conformados por: Julio Zambrano, Angel Villegas y Andrea Ruiz. Creamos este nombre para conformar nuestro equipo y hacer nuestros proyectos en Samsung Innovation Campus (SIC).
 
-[!NOTE]
+> [!NOTE]
 > Mencion honorifica: A nuestros compañeros Jose Villalobos y Rodolfo Rodriguez por aportar a la creacion de este nombre y primer proyecto hecho.
 
 ### Proyectos realizados:
