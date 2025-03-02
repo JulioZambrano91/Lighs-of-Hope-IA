@@ -40,7 +40,7 @@ Estas son las librerias que usamos para la creacion de nuestro proyecto.
 
 ## Data:
 
-Nuestra data fue extraida desde: [DATA]
+Nuestra data fue extraida desde [aqui.](https://www.kaggle.com/datasets/techsash/waste-classification-data)
 
 Detalles del manejo de la data y entrenamiento del modelo: [Jupyter]
 
