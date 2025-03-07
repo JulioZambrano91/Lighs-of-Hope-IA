@@ -13,7 +13,7 @@ Nuestro proyecto esta basado en la idea del reciclaje, ¿Como podemos aportar a 
 
 ## Librerias:
 > [!IMPORTANT]
-> Es importante verificar si las librerias estan instaladas en su equipo.
+> Es importante verificar si las librerias estan instaladas en su equipo. Todas las librerias usadas se encuentran en imports.py
 
 Estas son las librerias que usamos para la creacion de nuestro proyecto.
 
@@ -51,6 +51,8 @@ Mas detalle del manejo de nuestra data se encuentra en este PDF: [PDF]
 
 En nuestra interfaz grafica podras conocer mas detalle acerca del reciclaje, informacion sencilla de digerir y intuitiva, tambien encontrara detalles mas tecnicos como graficas de perdida de valor y un clasificador de reporte final. Pero la funcion principal que hace nuestra interfaz grafica es poder interactuar con nuestro modelo entrenado, podras subir imagenes y este te la clasificara en una categoria, te dara informacion util de sobre el tiempo de vida de ese tipo de elementos y como reciclarlo, a la ves podras prender tu camara y nuestro modelo sera capaz de detectar el material que estas sosteniendo y darte esa misma informacion sin la tediosa tarea de subir una imagen manualmente.
 
+> [!IMPORTANT]
+>Para ejecutar la interfaz grafica es solo necesario abrir y ejecutar el archivo: main.py
 
 ## Agradecimientos
 
