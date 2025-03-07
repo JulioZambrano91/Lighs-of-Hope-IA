@@ -6,7 +6,7 @@ Nuestro proyecto esta basado en la idea del reciclaje, ¿Como podemos aportar a 
 1. [Librerias](#Librerias)
 2. [Extraccion de la data](#Data)
 3. [Graficas](#Graficas)
-4. [Interfaz Grafica](#Interfaz Grafica)
+4. [Interfaz Grafica](#Interfaz_Grafica)
 5. [PDF](#PDF)
 6. [Acerca de](#Acerca_de)
 7. [Agradecimientos](#Agradecimientos)
