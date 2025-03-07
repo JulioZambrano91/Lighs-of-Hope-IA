@@ -6,7 +6,7 @@ Nuestro proyecto esta basado en la idea del reciclaje, ¿Como podemos aportar a 
 1. [Librerias](#Librerias)
 2. [Extraccion de la data](#Data)
 3. [Graficas](#Graficas)
-4. [Interfaz Grafica](#Interfaz_Grafica)
+4. [Interfaz Grafica](#Interfaz Grafica)
 5. [PDF](#PDF)
 6. [Acerca de](#Acerca_de)
 7. [Agradecimientos](#Agradecimientos)
@@ -47,7 +47,7 @@ Detalles del manejo de la data y entrenamiento del modelo: [Jupyter]
 Mas detalle del manejo de nuestra data se encuentra en este PDF: [PDF]
 
 
-## Interfaz_Grafica:
+## Interfaz Grafica:
 
 En nuestra interfaz grafica podras conocer mas detalle acerca del reciclaje, informacion sencilla de digerir y intuitiva, tambien encontrara detalles mas tecnicos como graficas de perdida de valor y un clasificador de reporte final. Pero la funcion principal que hace nuestra interfaz grafica es poder interactuar con nuestro modelo entrenado, podras subir imagenes y este te la clasificara en una categoria, te dara informacion util de sobre el tiempo de vida de ese tipo de elementos y como reciclarlo, a la ves podras prender tu camara y nuestro modelo sera capaz de detectar el material que estas sosteniendo y darte esa misma informacion sin la tediosa tarea de subir una imagen manualmente.
 
