@@ -1,0 +1,62 @@
+{
+    "cardboard": {
+        "tipo": "cardboard",
+        "duracion": "2 meses (tiempo para biodegradarse)",
+        "informacion": "Material fibroso derivado de celulosa, 90% reciclable",
+        "reciclaje": {
+            "contenedor": "Azul",
+            "simbolo": "♻ 20",
+            "color": "#1E90FF"
+        },
+        "otros": "Retirar cintas y grapas antes de reciclar",
+        "imagen": "imagenes/reciclaje.jpg"
+    },
+    "glass": {
+        "tipo": "glass",
+        "duracion": "4000+ años (tiempo para biodegradarse)",
+        "informacion": "100% reciclable infinitamente",
+        "reciclaje": {
+            "contenedor": "Verde",
+            "simbolo": "🥃",
+            "color": "#228B22"
+        },
+        "otros": "Separar por colores (transparente/verde/ámbar)",
+        "imagen": "imagenes/reciclaje.jpg"
+    },
+    "metal": {
+        "tipo": "metal",
+        "duracion": "200-500 años (tiempo para biodegradarse)",
+        "informacion": "Reciclar aluminio ahorra 95% de energía",
+        "reciclaje": {
+            "contenedor": "Amarillo",
+            "simbolo": "⚙️",
+            "color": "#FFD700"
+        },
+        "otros": "Compactar latas antes de reciclar",
+        "imagen": "imagenes/reciclaje.jpg"
+    },
+    "paper": {
+        "tipo": "paper",
+        "duracion": "2-5 meses (tiempo para biodegradarse)",
+        "informacion": "1 tonelada reciclada = 17 árboles salvados, 26,500 litros de agua y 4,100 kilovatios-hora de electricidad.",
+        "reciclaje": {
+            "contenedor": "Azul",
+            "simbolo": "📄",
+            "color": "#87CEEB"
+        },
+        "otros": "No reciclar papel encerado o térmico",
+        "imagen": "imagenes/reciclaje.jpg"
+    },
+    "plastic": {
+        "tipo": "plastic",
+        "duracion": "450-1000 años (tiempo para biodegradarse)",
+        "informacion": "Solo 9% se recicla globalmente",
+        "reciclaje": {
+            "contenedor": "Amarillo",
+            "simbolo": "♷",
+            "color": "#FFD700"
+        },
+        "otros": "Lavar envases antes de reciclar",
+        "imagen": "imagenes/reciclaje.jpg"
+    }
+}
