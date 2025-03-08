@@ -5,11 +5,12 @@ Nuestro proyecto esta basado en la idea del reciclaje, ¿Como podemos aportar a 
 ## Tabla de contenido:
 1. [Librerias](#Librerias)
 2. [Extraccion de la data](#Data)
-3. [Graficas](#Graficas)
-4. [Interfaz Grafica](#Interfaz_Grafica)
-5. [PDF](#PDF)
-6. [Acerca de](#Acerca_de)
-7. [Agradecimientos](#Agradecimientos)
+3. [Video](#Video)
+4. [Graficas](#Graficas)
+5. [Interfaz Grafica](#Interfaz_Grafica)
+6. [PDF](#PDF)
+7. [Acerca de](#Acerca_de)
+8. [Agradecimientos](#Agradecimientos)
 
 ## Librerias:
 > [!IMPORTANT]
@@ -46,6 +47,9 @@ Detalles del manejo de la data y entrenamiento del modelo: Clasificador_de_Image
 
 Mas detalle del manejo de nuestra data se encuentra en este PDF: Proyectos IA - Desarrollo y Orientación - Propuestas de Proyectos (1).pdf
 
+## Video:
+
+Video explicativo: [EcoClass - a lights of hope proyect](https://youtu.be/zuuZbU1gVeA)
 
 ## Interfaz Grafica:
 
