@@ -1,4 +1,3 @@
-# Elimina la función resource_path de aquí
 # ============ CORE =============
 import os
 import sys
