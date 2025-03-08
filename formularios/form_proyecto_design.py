@@ -1,241 +1,271 @@
-from imports import ( tk, Image, ImageTk, font )
-import webbrowser
+from imports import (
+    tk, Image, ImageTk, font,
+    resource_path, webbrowser
+)
 
-class FormularioProyectoDesign(tk.Tk):
+class FormularioProyectoDesign(tk.Frame):
     def __init__(self, panel_principal):
-        self.fuente_titulo = ("Montserrat", 22, "bold")
-        self.fuente_seccion = ("Open Sans", 18, "bold")
-        self.fuente_texto = ("Open Sans", 16)
-        self.fuente_negrita = font.Font(family="Open Sans", size=14, weight="bold")
+        super().__init__(panel_principal, bg="#F8F9FA")
+        self.pack(fill="both", expand=True)
+        
+        # Configuración inicial
+        self.fuente_titulo = ("Montserrat", 18, "bold")
+        self.fuente_seccion = ("Open Sans", 14, "bold")
+        self.fuente_texto = ("Open Sans", 12)
         self.color_titulo = "#2C3E50"
         self.color_seccion = "#2980B9"
         self.color_texto = "#2C3E50"
         self.color_fondo = "#F8F9FA"
         self.color_borde = "#DEE2E6"
-        self.agregar_contenido(panel_principal)
-
-    def agregar_contenido(self, panel_principal):
-        canvas = tk.Canvas(panel_principal, width=1000, height=800, bg=self.color_fondo)
-        scrollbar = tk.Scrollbar(panel_principal, orient="vertical", command=canvas.yview)
-        scrollable_frame = tk.Frame(canvas, bg=self.color_fondo)
-
-        scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set, bg=self.color_fondo)
-
-        # Secciones del contenido
-        self.crear_titulo(scrollable_frame)
-        self.crear_descripcion(scrollable_frame)
-        self.crear_tabla_contenidos(scrollable_frame)
-        self.crear_librerias(scrollable_frame)
-        self.crear_data(scrollable_frame)
-        self.crear_interfaz(scrollable_frame)
-        self.crear_agradecimientos(scrollable_frame)
-        self.crear_acerca_de(scrollable_frame)
-
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
         
-        # Configuración del scroll mediante el mouse
-        def _on_mousewheel(event):
-            canvas.yview_scroll(-1 * (event.delta // 120), "units")
+        # Configurar sistema de scroll
+        self.configurar_scroll()
         
-        def bind_children(parent):
-            parent.bind("<MouseWheel>", _on_mousewheel)
-            for child in parent.winfo_children():
-                bind_children(child)
-        
-        bind_children(scrollable_frame)
-        canvas.bind("<MouseWheel>", _on_mousewheel)
+        # Cargar contenido
+        self.agregar_contenido()
 
-    def crear_marco_texto(self, frame, texto, fuente, margen=(10, 10)):
-        """
-        Crea un marco (Frame) con un Label interno.
-        Se utiliza wraplength para ajustar el texto y el contenido se ancla a la izquierda.
-        """
-        marco = tk.Frame(frame, bg="white", bd=2, relief="solid", 
-                         padx=20, pady=10, highlightbackground=self.color_borde)
-        marco.pack(pady=margen, fill="x", padx=50, anchor="w")
+    def configurar_scroll(self):
+        # Contenedor principal
+        self.main_frame = tk.Frame(self, bg=self.color_fondo)
+        self.main_frame.pack(fill="both", expand=True)
+        
+        # Canvas y scrollbar
+        self.canvas = tk.Canvas(
+            self.main_frame,
+            bg=self.color_fondo,
+            highlightthickness=0
+        )
+        self.scrollbar = tk.Scrollbar(
+            self.main_frame,
+            orient="vertical",
+            command=self.canvas.yview
+        )
+        
+        # Frame scrollable
+        self.scrollable_frame = tk.Frame(
+            self.canvas,
+            bg=self.color_fondo
+        )
+        
+        # Configurar canvas
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: self.canvas.configure(
+                scrollregion=self.canvas.bbox("all")
+            )
+        )
+        
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        
+        # Empaquetar elementos
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
+        
+        # Evento de scroll con rueda del mouse
+        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+        
+    def _on_mousewheel(self, event):
+        self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        
+    def agregar_contenido(self):
+        self.crear_titulo()
+        self.crear_exploracion_datos()
+        self.crear_preparacion_datos()
+        self.crear_modelo()
+        self.crear_entrenamiento()
+        self.crear_evaluacion()
+        self.crear_exportacion()
+        
+    def agregar_imagen(self, frame, ruta_imagen, tamaño, titulo=None):
+        try:
+            imagen = Image.open(resource_path(ruta_imagen))
+            imagen = imagen.resize(tamaño, Image.LANCZOS)
+            photo = ImageTk.PhotoImage(imagen)
+            label = tk.Label(frame, image=photo, bg="white")
+            label.image = photo
+            if titulo:
+                tk.Label(frame, text=titulo, bg="white", font=("Open Sans", 10)).pack()
+            return label
+        except Exception as e:
+            print(f"Error cargando imagen: {e}")
+            return self.crear_placeholder(frame, tamaño, titulo)
+
+    def crear_placeholder(self, frame, tamaño, titulo=None):
+        try:
+            imagen = Image.open(resource_path("imagenes/data.png"))
+            imagen = imagen.resize(tamaño, Image.LANCZOS)
+            photo = ImageTk.PhotoImage(imagen)
+            label = tk.Label(frame, image=photo, bg="white")
+            label.image = photo
+            if titulo:
+                tk.Label(frame, text=titulo, bg="white", font=("Open Sans", 10)).pack()
+            return label
+        except Exception as e:
+            print(f"Error cargando placeholder: {e}")
+            placeholder = tk.Canvas(frame, width=tamaño[0], height=tamaño[1], bg="#e1e1e1")
+            placeholder.create_text(
+                tamaño[0]//2, tamaño[1]//2,
+                text="Imagen no disponible\n(Placeholder)",
+                fill="#666",
+                font=("Arial", 10),
+                justify="center"
+            )
+            if titulo:
+                tk.Label(frame, text=titulo, bg="white", font=("Open Sans", 10)).pack()
+            return placeholder
+
+    def crear_marco_seccion(self, texto, fuente):
+        marco = tk.Frame(
+            self.scrollable_frame,
+            bg="white",
+            bd=2,
+            relief="solid",
+            padx=20,
+            pady=10,
+            highlightbackground=self.color_borde
+        )
+        marco.pack(pady=10, fill="x", padx=20)
+        
         tk.Label(
-            marco, 
-            text=texto, 
-            wraplength=800, 
-            justify="left", 
-            anchor="w", 
-            font=fuente, 
-            fg=self.color_texto, 
+            marco,
+            text=texto,
+            wraplength=900,
+            justify="left",
+            anchor="w",
+            font=fuente,
+            fg=self.color_texto,
             bg="white"
         ).pack(fill="x")
+        
         return marco
 
-    def crear_titulo(self, frame):
-        contenedor_titulo = tk.Frame(frame, bg=self.color_fondo)
-        contenedor_titulo.pack(pady=20)
+    def crear_titulo(self):
+        contenedor = tk.Frame(
+            self.scrollable_frame,
+            bg=self.color_fondo
+        )
+        contenedor.pack(pady=20, fill="x")
         
-        # Texto del título centrado
         tk.Label(
-            contenedor_titulo, 
-            text="Clasificador de Imágenes de Reciclaje (CNN)", 
-            font=self.fuente_titulo, 
+            contenedor,
+            text="Proceso de Desarrollo del Modelo CNN",
+            font=self.fuente_titulo,
             fg=self.color_titulo,
-            bg=self.color_fondo,
-            justify="center", 
-            anchor="center"
-        ).pack(pady=5, fill="x")
+            bg=self.color_fondo
+        ).pack()
+
+    def crear_exploracion_datos(self):
+        contenido = (
+            "1. Exploración de Datos\n\n"
+            "• Verificación estructural:\n"
+            "  o 5 carpetas (cardboard, glass, metal, paper, plastic)\n"
+            "  o 1,000 imágenes por clase en RGB\n\n"
+            "• Distribución balanceada:\n"
+            "  o 20% por clase (evitando sesgos)\n\n"
+            "• Visualización de muestras:\n"
+            "  o 3 imágenes representativas por clase"
+        )
+        marco = self.crear_marco_seccion(contenido, self.fuente_texto)
         
-        # Se muestra la imagen del título (centrada)
-        try:
-            imagen = Image.open("imagenes/logo.png")
-            imagen = imagen.resize((120, 120), Image.LANCZOS)
-            photo = ImageTk.PhotoImage(imagen)
-            tk.Label(contenedor_titulo, image=photo, bg=self.color_fondo).pack(pady=5)
-            # Guardar la referencia para evitar que se recoja la imagen
-            contenedor_titulo.image = photo
-        except Exception as e:
-            print(f"Error cargando logo: {e}")
+        # Contenedor para imágenes
+        img_frame = tk.Frame(marco, bg="white")
+        img_frame.pack(pady=10, fill="x")
+        
+        # Imagen 1
+        frame_img1 = tk.Frame(img_frame, bg="white")
+        frame_img1.pack(side="left", padx=10)
+        self.agregar_imagen(
+            frame_img1,
+            "imagenes/data.png",
+            (400, 200),
+            "Estructura de Carpetas"
+        ).pack()
+        
 
-    def crear_descripcion(self, frame):
-        marco = tk.Frame(frame, bg=self.color_fondo)
-        marco.pack(pady=20, fill="x")
-
-        # Texto descriptivo (alineado a la izquierda)
-        texto = (
-            "Nuestro proyecto busca contribuir al reciclaje mediante una red neuronal "
-            "convolucional capaz de clasificar imágenes en 5 categorías:"
-        )
-        self.crear_marco_texto(marco, texto, self.fuente_texto)
-
-        # Lista de categorías (alineadas a la izquierda)
-        categorias = [
-            "⬤ Cartón (Cardboard)",
-            "⬤ Vidrio (Glass)",
-            "⬤ Metal",
-            "⬤ Papel",
-            "⬤ Plástico"
-        ]
-
-        marco_categorias = tk.Frame(frame, bg=self.color_fondo)
-        marco_categorias.pack(pady=10, fill="x")
-        for categoria in categorias:
-            tk.Label(
-                marco_categorias, 
-                text=categoria, 
-                font=self.fuente_negrita, 
-                fg=self.color_texto, 
-                bg=self.color_fondo,
-                justify="left", 
-                anchor="w"
-            ).pack(anchor="w", padx=100, fill="x")
-
-        # Texto final del apartado
-        texto_final = (
-            "El objetivo es que cualquier usuario pueda identificar cómo desechar correctamente "
-            "diferentes materiales y obtener información sobre puntos de reciclaje."
-        )
-        self.crear_marco_texto(frame, texto_final, self.fuente_texto)
-
-    def crear_tabla_contenidos(self, frame):
-        marco = self.crear_marco_texto(frame, "Tabla de Contenidos", self.fuente_seccion)
-        secciones = [
-            "1. Librerías", 
-            "2. Extracción de datos", 
-            "3. Gráficas",
-            "4. Interfaz Gráfica", 
-            "5. PDF", 
-            "6. Acerca de", 
-            "7. Agradecimientos"
-        ]
-        for seccion in secciones:
-            tk.Label(
-                marco, 
-                text=seccion, 
-                font=self.fuente_texto, 
-                fg=self.color_texto, 
-                bg="white",
-                justify="left", 
-                anchor="w"
-            ).pack(pady=3, anchor="w", fill="x")
-
-    def crear_librerias(self, frame):
+    def crear_preparacion_datos(self):
         contenido = (
-            "Librerías Principales Utilizadas\n\n"
-            "Para el modelo CNN:\n"
-            "- TensorFlow/Keras\n- OpenCV\n- NumPy\n- Matplotlib\n\n"
-            "Para la interfaz gráfica:\n"
-            "- Tkinter\n- Pillow (PIL)\n- OS\n- Shutil"
+            "2. Preparación de Datos\n\n"
+            "• Aumento de datos:\n"
+            "  o Rotación ±25°\n"
+            "  o Zoom 15%\n"
+            "  o Ajuste de brillo\n\n"
+            "• Normalización:\n"
+            "  o Valores 0-255 → 0-1"
         )
-        self.crear_marco_texto(frame, contenido, self.fuente_texto)
+        marco = self.crear_marco_seccion(contenido, self.fuente_texto)
+        self.agregar_imagen(
+            marco,
+            "imagenes/clases.png",
+            (400, 60),
+            "Distribucion de la data"
+        ).pack(pady=10)
 
-    def crear_data(self, frame):
+    def crear_modelo(self):
         contenido = (
-            "Fuente de Datos\n\n"
-            "Dataset de Waste Classification de Kaggle.\n"
-            "Enlace al dataset: https://www.kaggle.com/datasets/techsash/waste-classification-data"
+            "3. Construcción del Modelo\n\n"
+            "• MobileNetV2 con capas congeladas\n"
+            "• Arquitectura personalizada:\n"
+            "  o GlobalAveragePooling2D\n"
+            "  o Dropout(0.6)\n"
+            "  o Dense(256)"
         )
-        marco = self.crear_marco_texto(frame, contenido, self.fuente_texto)
+        marco = self.crear_marco_seccion(contenido, self.fuente_texto)
+        self.agregar_imagen(
+            marco,
+            "imagenes/modelo.png",
+            (900, 400),
+            "Diagrama de Arquitectura"
+        ).pack(pady=10)
+
+    def crear_entrenamiento(self):
+        contenido = (
+            "4. Entrenamiento\n\n"
+            "• Curvas de aprendizaje\n"
+            "• Métricas de rendimiento\n"
+            "• Early Stopping"
+        )
+        marco = self.crear_marco_seccion(contenido, self.fuente_texto)
+        self.agregar_imagen(
+            marco,
+            "imagenes/entrenamiento.png",
+            (1000, 100),
+            "Gráficas de Entrenamiento"
+        ).pack(pady=10)
+
+    def crear_evaluacion(self):
+        contenido = (
+            "5. Evaluación\n\n"
+            "• Matriz de confusión\n"
+            "• Métricas por clase\n"
+            "• Resultados finales"
+        )
+        marco = self.crear_marco_seccion(contenido, self.fuente_texto)
+        self.agregar_imagen(
+            marco,
+            "imagenes/graficas.png",
+            (1000, 400),
+            "Resultados Finales"
+        ).pack(pady=10)
+
+    def crear_exportacion(self):
+        contenido = (
+            "6. Exportación del Modelo\n\n"
+            "• Arquitectura guardada\n"
+            "• Peso del modelo\n"
+            "• Ejemplos de implementación"
+        )
+        marco = self.crear_marco_seccion(contenido, self.fuente_texto)
+        
+        # Enlace a GitHub
+        enlace_frame = tk.Frame(marco, bg="white")
+        enlace_frame.pack(pady=10)
         enlace = tk.Label(
-            marco, 
-            text="Abrir enlace", 
-            fg="blue", 
-            cursor="hand2", 
-            font=self.fuente_texto, 
-            bg="white",
-            justify="left", 
-            anchor="w"
+            enlace_frame,
+            text="Repositorio GitHub",
+            fg="blue",
+            cursor="hand2",
+            font=("Open Sans", 12)
         )
-        enlace.pack(pady=5, anchor="w", fill="x")
-        enlace.bind("<Button-1>", lambda e: webbrowser.open("https://www.kaggle.com/datasets/techsash/waste-classification-data"))
-
-    def crear_interfaz(self, frame):
-        contenido = (
-            "Funcionalidades de la Interfaz Gráfica del Usuario (GUI)\n\n"
-            "- Clasificación de imágenes mediante carga directa o uso de cámara web\n"
-            "- Visualización de gráficas de entrenamiento y desempeño del modelo\n"
-            "- Información detallada sobre tiempos de degradación de materiales\n"
-            "- Guías de reciclaje interactivas\n"
-            "- Generación y exportación de reportes en PDF"
-        )
-        self.crear_marco_texto(frame, contenido, self.fuente_texto)
-
-    def crear_agradecimientos(self, frame):
-        contenido = (
-            "Agradecimientos Especiales\n\n"
-            "Equipo desarrollador:\n"
-            "- Julio Zambrano\n- Angel Villegas\n- Andrea Ruiz\n\n"
-            "Tutores:\n"
-            "- Jenny Remolina\n- Álvaro Arauz\n\n"
-            "Agradecimiento especial a Samsung Innovation Campus"
-        )
-        self.crear_marco_texto(frame, contenido, self.fuente_texto)
-
-    def crear_acerca_de(self, frame):
-        marco = tk.Frame(frame, bg=self.color_fondo)
-        marco.pack(pady=20, fill="x")
-        try:
-            imagen = Image.open("imagenes/light.png")
-            imagen = imagen.resize((150, 150), Image.LANCZOS)
-            photo = ImageTk.PhotoImage(imagen)
-            tk.Label(marco, image=photo, bg=self.color_fondo).pack(side="left", padx=10)
-            marco.image = photo
-        except Exception as e:
-            print(f"Error cargando logo: {e}")
-        contenido = (
-            "Acerca de Lights of Hope\n\n"
-            "Proyectos realizados:\n"
-            "- Análisis de desastres naturales\n"
-            "- Sistema de clasificación de residuos con IA\n\n"
-            "Repositorio GitHub: https://github.com/JulioZambrano91/Lights-of-Hope-IA"
-        )
-        marco_texto = self.crear_marco_texto(marco, contenido, self.fuente_texto)
-        enlace = tk.Label(
-            marco_texto, 
-            text="Visitar GitHub", 
-            fg="blue", 
-            cursor="hand2", 
-            font=self.fuente_texto, 
-            bg="white",
-            justify="left", 
-            anchor="w"
-        )
-        enlace.pack(pady=5, fill="x", anchor="w")
-        enlace.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/JulioZambrano91/Lights-of-Hope-IA"))
+        enlace.pack()
+        enlace.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/JulioZambrano91/Lighs-of-Hope-IA"))

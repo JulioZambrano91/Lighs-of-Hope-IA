@@ -16,7 +16,7 @@ class FormularioInfoDesign(tk.Toplevel):
         util_ventana.centrar_ventana(self, w, h)     
     
     def contruirWidget(self):         
-        self.labelVersion = tk.Label(self, text="Version GUI: 1.1")
+        self.labelVersion = tk.Label(self, text="Version GUI: 1.2")
         self.labelVersion.config(fg="#000000", font=("Roboto", 15), pady=30, width=30)
         self.labelVersion.pack()
 

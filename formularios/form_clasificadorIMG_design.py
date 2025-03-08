@@ -19,7 +19,6 @@ class ReinforcementTrainer:
     def get_action(self, state):
         if np.random.rand() <= self.epsilon:
             return np.random.choice(self.action_size)
-        # Usar el modelo para predecir la mejor acción
         q_values = self.model.predict(state, verbose=0)
         return np.argmax(q_values[0])
     
@@ -42,7 +41,6 @@ class ReinforcementTrainer:
             self.epsilon *= self.epsilon_decay
 
     def get_training_parameters(self, action):
-        # Definir parámetros basados en la acción seleccionada
         params = {
             'learning_rate': 0.0001,
             'epochs': 3
@@ -68,15 +66,17 @@ class FormularioClasificadorIMGDesign(tk.Frame):
         self.corrections_dir = "user_corrections"
         self.image_path = None
         self.current_correction = None
-
+        self.zoom_button = None
+        
         # Configurar scroll
         self._configurar_scroll()
         
-        # Cargar modelo y widgets
+        # Cargar modelo e información
         self.load_model()
         self.rl_trainer = ReinforcementTrainer(self.model)
-        # Cargar información de reciclaje desde el JSON actualizado
         self.reciclaje_data = self._cargar_info_reciclaje()
+        
+        # Crear widgets
         self.create_widgets()
         os.makedirs(self.corrections_dir, exist_ok=True)
         
@@ -100,7 +100,7 @@ class FormularioClasificadorIMGDesign(tk.Frame):
         except Exception as e:
             messagebox.showerror("Error crítico", f"No se pudo cargar el modelo:\n{str(e)}")
             self.master.destroy()
-
+            
     def create_widgets(self):
         # Configuración del estilo
         bg_color = '#F0F0F0'
@@ -115,14 +115,16 @@ class FormularioClasificadorIMGDesign(tk.Frame):
         left_frame = tk.Frame(main_frame, bg=bg_color)
         left_frame.grid(row=0, column=0, sticky="nsew", padx=(0,20))
         
-        # Right Frame: Muestra la información completa del JSON
-        right_frame = tk.Frame(main_frame, bg=bg_color, bd=2, relief='groove')
-        right_frame.grid(row=0, column=1, sticky="nsew")
-        
+        # Right Frame: Muestra la información completa del JSON (se oculta por defecto)
+        self.right_frame = tk.Frame(main_frame, bg=bg_color, bd=2, relief='groove')
+        self.right_frame.grid(row=0, column=1, sticky="nsew")
         main_frame.columnconfigure(0, weight=2)
         main_frame.columnconfigure(1, weight=1)
         
-        # Controles del Left Frame
+        # Ocultar el panel derecho hasta tener una clasificación
+        self.right_frame.grid_remove()
+        
+        # CONTROLES DEL LEFT FRAME
         self.upload_btn = tk.Button(
             left_frame,
             text="Cargar Imagen",
@@ -221,95 +223,36 @@ class FormularioClasificadorIMGDesign(tk.Frame):
         )
         self.status_label.grid(row=4, column=0, columnspan=3)
         
-        # Controles del Right Frame: Información de reciclaje (completa)
-        self.info_imagen = tk.Label(right_frame, bg=bg_color)
-        self.info_imagen.pack(padx=10, pady=10)
-        self.info_texto = tk.Label(
-            right_frame, 
-            bg=bg_color,
-            justify='left',
-            font=('Arial', 12),  # Incrementamos el tamaño de letra
-            wraplength=300         # Ajustamos el wrap para un ancho medio
-        )
-        self.info_texto.pack(padx=10, pady=10)
-        # Botón para ver imagen completa en una ventana separada (se añade posteriormente)
-        self.zoom_button = None
-
-    def handle_feedback(self, is_correct):
-        if is_correct:
-            self.status_label.config(text="¡Gracias por tu retroalimentación!")
-            self.feedback_frame.grid_remove()
-        else:
-            self.correction_dropdown.pack(side=tk.LEFT, padx=5)
-            self.confirm_btn.pack(side=tk.LEFT, padx=5)
-            self.status_label.config(text="Selecciona la categoría correcta:")
-            
-    def save_correction(self):
-        correct_class = self.correction_var.get()
-        if not correct_class:
-            messagebox.showerror("Error", "Selecciona una categoría válida")
-            return
-        # Crear directorio para la clase si no existe
-        class_dir = os.path.join(self.corrections_dir, correct_class)
-        os.makedirs(class_dir, exist_ok=True)
-        # Copiar imagen al directorio de correcciones
-        filename = os.path.basename(self.image_path)
-        dest_path = os.path.join(class_dir, filename)
-        shutil.copyfile(self.image_path, dest_path)
-        # Actualizar modelo
-        self.update_model(dest_path, correct_class)
-        self.status_label.config(text="Corrección guardada y modelo actualizado!")
-        self.feedback_frame.grid_remove()
-        self.correction_dropdown.pack_forget()
-        self.confirm_btn.pack_forget()
+        # CONTROLES DEL RIGHT FRAME: Información de reciclaje
         
-    def update_model(self, image_path, correct_class):
-        try:
-            # Preprocesar imagen
-            img_array = self.preprocess_image(image_path)
-            # Convertir etiqueta a índice
-            label_index = self.class_names.index(correct_class)
-            labels = tf.convert_to_tensor([label_index])
-            # Obtener parámetros de entrenamiento con RL
-            state = np.expand_dims(img_array.numpy().flatten(), axis=0)
-            action = self.rl_trainer.get_action(state)
-            params = self.rl_trainer.get_training_parameters(action)
-            # Configurar aprendizaje de transferencia
-            self.model.trainable = True
-            self.model.compile(
-                optimizer=tf.keras.optimizers.Adam(learning_rate=params['learning_rate']),
-                loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                metrics=['accuracy']
-            )
-            # Entrenamiento
-            history = self.model.fit(
-                img_array,
-                labels,
-                epochs=params['epochs'],
-                verbose=0
-            )
-            # Calcular recompensa (mejora en precisión)
-            reward = history.history['accuracy'][-1] * 100
-            # Actualizar modelo de RL
-            next_state = np.expand_dims(img_array.numpy().flatten(), axis=0)
-            self.rl_trainer.remember(state, action, reward, next_state, False)
-            self.rl_trainer.replay()
-            # Mostrar información completa para la clase corregida en el panel derecho
-            self.display_recycling_info(correct_class)
-            print(f"Modelo actualizado con LR: {params['learning_rate']}, Epochs: {params['epochs']}, Recompensa: {reward:.2f}%")
-            self.save_model()
-        except Exception as e:
-            self.status_label.config(text=f"Error actualizando modelo: {str(e)}")
-            
-    def save_model(self):
-        """Guarda el modelo en disco."""
-        try:
-            self.model.save('best_model.keras')
-            self.status_label.config(text="Modelo guardado exitosamente!")
-        except Exception as e:
-            self.status_label.config(text="Error al guardar el modelo.")
-            print(f"Error guardando el modelo: {str(e)}")
-            
+        self.info_imagen = tk.Label(self.right_frame, bg=bg_color)
+        self.info_imagen.pack(padx=10, pady=10)
+        
+        self.info_table = ttk.Treeview(
+            self.right_frame, 
+            columns=("Propiedad", "Valor"), 
+            show="headings", 
+            height=7
+        )
+        self.info_table.heading("Propiedad", text="Propiedad")
+        self.info_table.heading("Valor", text="Valor")
+        self.info_table.column("Propiedad", anchor="w", width=120)
+        # Se aumenta el ancho para que textos largos no se corten
+        self.info_table.column("Valor", anchor="w", width=300)
+        self.info_table.pack(padx=10, pady=10, fill="both", expand=True)
+        
+        style = ttk.Style()
+        style.theme_use('clam')
+        style.configure("Treeview.Heading",
+                        font=("Helvetica", 10, "bold"),
+                        background="#4CAF50",
+                        foreground="white")
+        style.configure("Treeview",
+                        font=("Helvetica", 10),
+                        rowheight=25)
+        
+        self.zoom_button = None
+        
     def load_image(self):
         file_path = filedialog.askopenfilename()
         if file_path:
@@ -319,6 +262,8 @@ class FormularioClasificadorIMGDesign(tk.Frame):
             self.feedback_frame.grid_remove()
             self.result_text.delete(1.0, tk.END)
             self.status_label.config(text="")
+            # Ocultamos el panel derecho hasta clasificar
+            self.right_frame.grid_remove()
             
     def display_image(self, path):
         img = Image.open(path)
@@ -338,14 +283,13 @@ class FormularioClasificadorIMGDesign(tk.Frame):
             img_array = self.preprocess_image(self.image_path)
             predictions = self.model.predict(img_array)
             scores = tf.nn.softmax(predictions[0])
-            # Mostrar resultados
             class_confidences = list(zip(self.class_names, scores.numpy() * 100))
             sorted_confidences = sorted(class_confidences, key=lambda x: x[1], reverse=True)
             self.result_text.delete(1.0, tk.END)
             for i, (class_name, confidence) in enumerate(sorted_confidences):
                 line = f"{class_name.upper()}: {confidence:.2f}%\n"
                 self.result_text.insert(tk.END, line, 'bold' if i == 0 else '')
-            # Mostrar información completa en el panel derecho para la clase con mayor confianza
+            # Mostrar el panel derecho solo si hay una clasificación válida
             top_class = sorted_confidences[0][0]
             self.display_recycling_info(top_class)
             self.feedback_frame.grid()
@@ -353,15 +297,63 @@ class FormularioClasificadorIMGDesign(tk.Frame):
             self.result_text.delete(1.0, tk.END)
             self.result_text.insert(tk.END, f"Error: {str(e)}")
             
+    def update_model(self, image_path, correct_class):
+        try:
+            img_array = self.preprocess_image(image_path)
+            label_index = self.class_names.index(correct_class)
+            labels = tf.convert_to_tensor([label_index])
+            state = np.expand_dims(img_array.numpy().flatten(), axis=0)
+            action = self.rl_trainer.get_action(state)
+            params = self.rl_trainer.get_training_parameters(action)
+            self.model.trainable = True
+            self.model.compile(
+                optimizer=tf.keras.optimizers.Adam(learning_rate=params['learning_rate']),
+                loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                metrics=['accuracy']
+            )
+            history = self.model.fit(
+                img_array,
+                labels,
+                epochs=params['epochs'],
+                verbose=0
+            )
+            reward = history.history['accuracy'][-1] * 100
+            next_state = np.expand_dims(img_array.numpy().flatten(), axis=0)
+            self.rl_trainer.remember(state, action, reward, next_state, False)
+            self.rl_trainer.replay()
+            self.display_recycling_info(correct_class)
+            print(f"Modelo actualizado con LR: {params['learning_rate']}, Epochs: {params['epochs']}, Recompensa: {reward:.2f}%")
+            self.save_model()
+        except Exception as e:
+            self.status_label.config(text=f"Error actualizando modelo: {str(e)}")
+            
+    def save_model(self):
+        try:
+            self.model.save('best_model.keras')
+            self.status_label.config(text="Modelo guardado exitosamente!")
+        except Exception as e:
+            self.status_label.config(text="Error al guardar el modelo.")
+            print(f"Error guardando el modelo: {str(e)}")
+            
     def display_recycling_info(self, clase):
-        if clase not in self.reciclaje_data:
-            self.info_texto.config(text="No hay información disponible para esta categoría.")
-            self.info_imagen.config(image='')
+        # Mostrar u ocultar el panel derecho según la información
+        if clase in self.reciclaje_data:
+            self.right_frame.grid()
+        else:
+            self.right_frame.grid_remove()
             return
         
-        info = self.reciclaje_data[clase]
-        
-        # Cargar imagen ilustrativa redimensionada a tamaño medio (150x150)
+        # Limpiar el contenido previo de la tabla
+        for item in self.info_table.get_children():
+            self.info_table.delete(item)
+
+        info = self.reciclaje_data.get(clase, None)
+        if not info:
+            self.info_table.insert("", "end", values=("Información", "No disponible"))
+            self.info_imagen.config(image='')
+            return
+
+        # Mostrar la imagen ilustrativa
         try:
             img = Image.open(info['imagen'])
             img = img.resize((150, 150), Image.Resampling.LANCZOS)
@@ -370,23 +362,25 @@ class FormularioClasificadorIMGDesign(tk.Frame):
         except Exception as e:
             print(f"Error cargando imagen: {str(e)}")
             self.info_imagen.config(image='')
-        
-        # Formatear y mostrar toda la información del JSON
-        texto = (
-            f"TIPO: {info['tipo']}\n"
-            f"DURACIÓN: {info['duracion']}\n"
-            f"INFORMACIÓN: {info['informacion']}\n"
-            f"CONTENEDOR: {info['reciclaje']['contenedor']}\n"
-            f"SIMBOLO: {info['reciclaje']['simbolo']}\n"
-            f"COLOR: {info['reciclaje']['color']}\n"
-            f"OTROS: {info['otros']}"
-        )
-        self.info_texto.config(text=texto)
-        
-        # Agregar botón para ver la imagen completa en una ventana separada
+
+        # Insertar la información en la tabla
+        self.info_table.insert("", "end", values=("TIPO", info.get('tipo', 'N/A')))
+        self.info_table.insert("", "end", values=("DURACIÓN", info.get('duracion', 'N/A')))
+        self.info_table.insert("", "end", values=("INFORMACIÓN", info.get('informacion', 'N/A')))
+        reciclaje = info.get('reciclaje', {})
+        self.info_table.insert("", "end", values=("CONTENEDOR", reciclaje.get('contenedor', 'N/A')))
+        self.info_table.insert("", "end", values=("SÍMBOLO", reciclaje.get('simbolo', 'N/A')))
+        self.info_table.insert("", "end", values=("COLOR", reciclaje.get('color', 'N/A')))
+        self.info_table.insert("", "end", values=("OTROS", info.get('otros', 'N/A')))
+
+        # Crear o actualizar el botón para ver imagen completa
         if self.zoom_button:
             self.zoom_button.destroy()
-        self.zoom_button = tk.Button(self.info_imagen.master, text="Ver imagen completa", command=lambda: self.show_full_image(info['imagen']))
+        self.zoom_button = tk.Button(
+            self.info_imagen.master,
+            text="Ver imagen completa",
+            command=lambda: self.show_full_image(info['imagen'])
+        )
         self.zoom_button.pack(pady=5)
         
     def show_full_image(self, img_path):
@@ -402,8 +396,32 @@ class FormularioClasificadorIMGDesign(tk.Frame):
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo mostrar la imagen completa: {str(e)}")
             
+    def handle_feedback(self, is_correct):
+        if is_correct:
+            self.status_label.config(text="¡Gracias por tu retroalimentación!")
+            self.feedback_frame.grid_remove()
+        else:
+            self.correction_dropdown.pack(side=tk.LEFT, padx=5)
+            self.confirm_btn.pack(side=tk.LEFT, padx=5)
+            self.status_label.config(text="Selecciona la categoría correcta:")
+            
+    def save_correction(self):
+        correct_class = self.correction_var.get()
+        if not correct_class:
+            messagebox.showerror("Error", "Selecciona una categoría válida")
+            return
+        class_dir = os.path.join(self.corrections_dir, correct_class)
+        os.makedirs(class_dir, exist_ok=True)
+        filename = os.path.basename(self.image_path)
+        dest_path = os.path.join(class_dir, filename)
+        shutil.copyfile(self.image_path, dest_path)
+        self.update_model(dest_path, correct_class)
+        self.status_label.config(text="Corrección guardada y modelo actualizado!")
+        self.feedback_frame.grid_remove()
+        self.correction_dropdown.pack_forget()
+        self.confirm_btn.pack_forget()
+
     def _configurar_scroll(self):
-        # Canvas y scrollbar
         self.canvas = tk.Canvas(self, bg='#F0F0F0', highlightthickness=0)
         self.scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
         self.scrollable_frame = tk.Frame(self.canvas, bg='#F0F0F0')
@@ -416,7 +434,6 @@ class FormularioClasificadorIMGDesign(tk.Frame):
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
-        # Bind eventos del mouse
         def _on_mousewheel(event):
             if event.num == 4:
                 self.canvas.yview_scroll(-1, "units")
@@ -439,4 +456,3 @@ class FormularioClasificadorIMGDesign(tk.Frame):
 
         self.canvas.pack(side="left", fill="both", expand=True)
         self.scrollbar.pack(side="right", fill="y")
-        

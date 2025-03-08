@@ -1,51 +1,39 @@
 from imports import (
-    tk, font,
+    tk, font, webbrowser,
     COLOR_BARRA_SUPERIOR, COLOR_MENU_LATERAL,
     COLOR_CUERPO_PRINCIPAL, COLOR_MENU_CURSOR_ENCIMA,
-    util_ventana, util_img,
+    util_ventana, util_img, resource_path,
     FormularioInicioDesign, FormularioSitioConstruccionDesign,
     FormularioInfoDesign, FormularioClasificadorIMGDesign,
-    os, sys
+    FormularioProyectoDesign, Image, ImageTk
 )
 
-def resource_path(relative_path):
-    try:
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
-
 class FormularioMaestroDesign(tk.Tk):
-
     def __init__(self):
         super().__init__()
-
-        try:
-            self.logo = util_img.leer_imagen(resource_path("./imagenes/Perfil.png"), (500, 136))
-            self.perfil = util_img.leer_imagen(resource_path("./imagenes/logo.ico"), (100, 100))
-            self.img_sitio_construccion = util_img.leer_imagen(resource_path("./imagenes/sitio_construccion.jpg"), (200, 200))
-        except Exception as e:
-            print(f"Error al cargar imágenes: {e}")
-            return
-
         self.config_window()
+        self.cargar_imagenes()
         self.paneles()
         self.controles_barra_superior()
         self.controles_menu_lateral()
-        self.controles_cuerpo()
+        self.controles_cuerpo()  
+
+    def cargar_imagenes(self):
+        try:
+            self.logo = util_img.leer_imagen(resource_path("./imagenes/Perfil.png"), (500, 136))
+            self.perfil = util_img.leer_imagen(resource_path("./imagenes/logo.ico"), (100, 100))  # Asegurar que existe
+            self.img_sitio_construccion = util_img.leer_imagen(resource_path("./imagenes/sitio_construccion.jpg"), (200, 200))
+        except Exception as e:
+            print(f"Error crítico al cargar imágenes: {e}")
+            sys.exit(1)  # Detener ejecución si fallan imágenes esenciales
 
     def config_window(self):
-        # Configuración inicial de la ventana
         self.title('Clasificador de Residuos')
         self.iconbitmap(resource_path("./imagenes/logo.ico"))
         w, h = 1280, 720
-        try:
-            util_ventana.centrar_ventana(self, w, h)
-        except Exception as e:
-            print(f"Error al centrar ventana: {e}")
+        util_ventana.centrar_ventana(self, w, h)
 
     def paneles(self):
-        # Crear paneles: barra superior, menú lateral y cuerpo principal
         self.barra_superior = tk.Frame(self, bg=COLOR_BARRA_SUPERIOR, height=50)
         self.barra_superior.pack(side=tk.TOP, fill='both')
         
@@ -57,32 +45,38 @@ class FormularioMaestroDesign(tk.Tk):
 
     def controles_barra_superior(self):
         font_awesome = font.Font(family='FontAwesome', size=12)
-
-        # Etiqueta de título
         self.labelTitulo = tk.Label(self.barra_superior, text="Lights of Hope")
         self.labelTitulo.config(fg="#fff", font=("Roboto", 15), bg=COLOR_BARRA_SUPERIOR, pady=10, width=16)
         self.labelTitulo.pack(side=tk.LEFT)
 
-        # Botón del menú lateral
         self.buttonMenuLateral = tk.Button(self.barra_superior, text="\uf0c9", font=font_awesome,
-                                           command=self.toggle_panel, bd=0, bg=COLOR_BARRA_SUPERIOR, fg="white")
+                                         command=self.toggle_panel, bd=0, bg=COLOR_BARRA_SUPERIOR, fg="white")
         self.buttonMenuLateral.pack(side=tk.LEFT)
 
-        # Etiqueta de información
-        self.labelTitulo = tk.Label(self.barra_superior, text="SAMSUNG INNOVATION CAMPUS (SIC)")
-        self.labelTitulo.config(fg="#fff", font=("Roboto", 10), bg=COLOR_BARRA_SUPERIOR, padx=25, width=25)
-        self.labelTitulo.pack(side=tk.RIGHT)
+        self.labelInfo = tk.Label(self.barra_superior, text="SAMSUNG INNOVATION CAMPUS (SIC)")
+        self.labelInfo.config(fg="#fff", font=("Roboto", 10), bg=COLOR_BARRA_SUPERIOR, padx=25, width=25)
+        self.labelInfo.pack(side=tk.RIGHT)
+
+    def controles_cuerpo(self):
+        """Configura los elementos del cuerpo principal"""
+        try:
+            label = tk.Label(
+                self.cuerpo_principal, 
+                image=self.logo, 
+                bg=COLOR_CUERPO_PRINCIPAL
+            )
+            label.place(x=0, y=0, relwidth=1, relheight=1)
+        except AttributeError as e:
+            print(f"Error al cargar imagen en cuerpo principal: {e}")
 
     def controles_menu_lateral(self):
         ancho_menu = 20
         alto_menu = 2
         font_awesome = font.Font(family='FontAwesome', size=15)
 
-        # Etiqueta de perfil
         self.labelPerfil = tk.Label(self.menu_lateral, image=self.perfil, bg=COLOR_MENU_LATERAL)
         self.labelPerfil.pack(side=tk.TOP, pady=10)
 
-        # Botones del menú lateral
         self.buttonDashBoard = tk.Button(self.menu_lateral)
         self.buttonProfile = tk.Button(self.menu_lateral)
         self.buttonPicture = tk.Button(self.menu_lateral)
@@ -91,8 +85,8 @@ class FormularioMaestroDesign(tk.Tk):
 
         buttons_info = [
             ("Inicio", "\uf015", self.buttonDashBoard, self.abrir_panel_graficas),
-            ("Datos del proyecto", "\uf007", self.buttonProfile, self.abrir_panel_en_construccion),
-            ("Clasificador de Imagenes", "\uf302", self.buttonPicture, self.abrir_panel_clasificadorIMG),  # Nuevo botón
+            ("Datos del proyecto", "\uf007", self.buttonProfile, self.abrir_panel_proyecto),
+            ("Clasificador de Imagenes", "\uf302", self.buttonPicture, self.abrir_panel_clasificadorIMG),
             ("Clasificador en vivo", "\uf030", self.buttonInfo, self.abrir_panel_info),
             ("About us", "\uf013", self.buttonSettings, self.abrir_about_us)
         ]
@@ -100,33 +94,23 @@ class FormularioMaestroDesign(tk.Tk):
         for text, icon, button, comando in buttons_info:
             self.configurar_boton_menu(button, text, icon, font_awesome, ancho_menu, alto_menu, comando)
 
-
-    def controles_cuerpo(self):
-        # Imagen en el cuerpo principal
-        label = tk.Label(self.cuerpo_principal, image=self.logo, bg=COLOR_CUERPO_PRINCIPAL)
-        label.place(x=0, y=0, relwidth=1, relheight=1)
-
     def configurar_boton_menu(self, button, text, icon, font_awesome, ancho_menu, alto_menu, comando):
-        button.config(text=f"  {icon}    {text}", anchor="w", font=font_awesome, bd=0, bg=COLOR_MENU_LATERAL, fg="white",
-                      width=ancho_menu, height=alto_menu, command=comando)
+        button.config(text=f"  {icon}    {text}", anchor="w", font=font_awesome, bd=0, 
+                     bg=COLOR_MENU_LATERAL, fg="white", width=ancho_menu, height=alto_menu, command=comando)
         button.pack(side=tk.TOP)
         self.bind_hover_events(button)
 
     def bind_hover_events(self, button):
-        # Asociar eventos Enter y Leave con la función dinámica
         button.bind("<Enter>", lambda event: self.on_enter(event, button))
         button.bind("<Leave>", lambda event: self.on_leave(event, button))
 
     def on_enter(self, event, button):
-        # Cambiar estilo al pasar el ratón por encima
         button.config(bg=COLOR_MENU_CURSOR_ENCIMA, fg='white')
 
     def on_leave(self, event, button):
-        # Restaurar estilo al salir el ratón
         button.config(bg=COLOR_MENU_LATERAL, fg='white')
 
     def toggle_panel(self):
-        # Alternar visibilidad del menú lateral
         if self.menu_lateral.winfo_ismapped():
             self.menu_lateral.pack_forget()
         else:
@@ -140,11 +124,11 @@ class FormularioMaestroDesign(tk.Tk):
         self.limpiar_panel(self.cuerpo_principal)
         FormularioInfoDesign()
 
-    def abrir_panel_en_construccion(self):
+    def abrir_panel_proyecto(self):
         self.limpiar_panel(self.cuerpo_principal)
-        FormularioSitioConstruccionDesign(self.cuerpo_principal, self.img_sitio_construccion)
+        FormularioProyectoDesign(self.cuerpo_principal)
 
-    def abrir_panel_info(self): # CLASIFICADOR EN VIVO
+    def abrir_panel_info(self):
         self.limpiar_panel(self.cuerpo_principal)
         FormularioSitioConstruccionDesign(self.cuerpo_principal, self.img_sitio_construccion)
         
@@ -155,6 +139,9 @@ class FormularioMaestroDesign(tk.Tk):
         FormularioClasificadorIMGDesign(container)
 
     def limpiar_panel(self, panel):
-        # Función para limpiar el contenido del panel
         for widget in panel.winfo_children():
             widget.destroy()
+
+if __name__ == "__main__":
+    app = FormularioMaestroDesign()
+    app.mainloop()
