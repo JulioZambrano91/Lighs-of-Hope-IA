@@ -55,6 +55,11 @@ Video explicativo: [EcoClass - a lights of hope proyect](https://youtu.be/zuuZbU
 
 En nuestra interfaz grafica podras conocer mas detalle acerca del reciclaje, informacion sencilla de digerir y intuitiva, tambien encontrara detalles mas tecnicos como graficas de perdida de valor y un clasificador de reporte final. Pero la funcion principal que hace nuestra interfaz grafica es poder interactuar con nuestro modelo entrenado, podras subir imagenes y este te la clasificara en una categoria, te dara informacion util de sobre el tiempo de vida de ese tipo de elementos y como reciclarlo, a la ves podras prender tu camara y nuestro modelo sera capaz de detectar el material que estas sosteniendo y darte esa misma informacion sin la tediosa tarea de subir una imagen manualmente.
 
+![1  Inicio (información general de reciclaje)](https://github.com/user-attachments/assets/b35ef465-68ed-478f-93c7-e2a47110aa9c)
+![2  Datos del proyecto](https://github.com/user-attachments/assets/218ef680-fc3c-4472-a8d2-664c4a75be2f)
+![3  Clasificador de imágenes](https://github.com/user-attachments/assets/543afc9f-1c38-4b21-b4eb-003693eadcdf)
+
+
 > [!IMPORTANT]
 >Para ejecutar la interfaz grafica es solo necesario abrir y ejecutar el archivo: main.py
 
