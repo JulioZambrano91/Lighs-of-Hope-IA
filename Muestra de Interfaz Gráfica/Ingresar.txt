@@ -1,1 +1,0 @@
-Ingresa a la carpeta ECOCLASS y ejecuta el archivo main.py para hacer uso de la interfaz del programa.
