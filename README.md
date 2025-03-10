@@ -45,7 +45,7 @@ Nuestra data fue extraida desde [aqui.](https://www.kaggle.com/datasets/techsash
 
 Detalles del manejo de la data y entrenamiento del modelo: Clasificador_de_Imagenes_v3.ipynb
 
-Mas detalle del manejo de nuestra data se encuentra en este PDF: Proyectos IA - Desarrollo y Orientación - Propuestas de Proyectos (1).pdf
+Mas detalle del manejo de nuestra data se encuentra en la carpeta: Documentacion, con su respectivos PDF informativos.
 
 ## Video:
 
